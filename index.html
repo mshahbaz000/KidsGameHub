@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kids Game Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    
+    <!-- WebView User-Agent Override Script -->
+    <script>
+    // Force WebView to mimic Chrome for Adsterra compatibility
+    if (navigator.userAgent.includes('WebView')) {
+        navigator.__defineGetter__('userAgent', function() {
+            return "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36";
+        });
+    }
+    </script>
+
     <style>
         :root {
             --primary: #FF6B6B;
@@ -44,7 +55,6 @@
             padding: 1rem;
         }
         
-        /* AD CONTAINER STYLES */
         .ad-container {
             max-width: 728px;
             margin: 20px auto;
@@ -159,10 +169,6 @@
             
             h1 {
                 font-size: 2rem;
-            }
-            
-            .ad-container {
-                padding: 5px;
             }
         }
         
@@ -325,6 +331,18 @@
                 gamesContainer.innerHTML = html;
             }
         });
+
+        // Additional fallback check for ads
+        setTimeout(function() {
+            if (typeof atOptions === 'undefined') {
+                console.log('Rechecking ad initialization...');
+                if (navigator.userAgent.includes('WebView')) {
+                    navigator.__defineGetter__('userAgent', function() {
+                        return "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36";
+                    });
+                }
+            }
+        }, 2000);
     </script>
 </body>
 </html>
