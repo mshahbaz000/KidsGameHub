@@ -6,7 +6,6 @@
     <!-- Critical Ad Tags -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Kids Game Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&display=swap" rel="stylesheet">
     
@@ -26,6 +25,9 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         
         header {
@@ -47,6 +49,7 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 1rem;
+            flex: 1;
         }
         
         .ad-container {
@@ -89,7 +92,104 @@
             transition: all 0.3s ease;
         }
         
-        /* [Rest of your existing CSS remains unchanged] */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .game-icon {
+            width: 100%;
+            height: 120px; /* Reduced from 150px */
+            object-fit: cover;
+            background-color: var(--accent);
+        }
+        
+        .game-name {
+            padding: 0.8rem;
+            margin: 0;
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--dark);
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+            grid-column: 1 / -1;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background-color: var(--secondary);
+            color: white;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        }
+        
+        footer p {
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .game-icon {
+                height: 100px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 1rem;
+            }
+            
+            .game-name {
+                font-size: 0.9rem;
+                padding: 0.6rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -100,9 +200,7 @@
     </header>
     
     <div class="container">
-        <!-- ==================== -->
-        <!-- TOP AD (728x90) - WORKING IMPLEMENTATION -->
-        <!-- ==================== -->
+        <!-- Top Ad (728x90) -->
         <div class="ad-container" id="top-ad">
             <div class="ad-label">Advertisement</div>
             <script type="text/javascript">
@@ -117,12 +215,7 @@
             </script>
             <!-- Fallback Content -->
             <div id="top-ad-fallback" style="display:none; color:var(--primary); padding:10px;">
-                <p>Ad couldn't load. Please:</p>
-                <ul style="text-align:left; margin:10px auto; width:fit-content">
-                    <li>Disable ad blockers</li>
-                    <li>Refresh the page</li>
-                    <li>Try different network</li>
-                </ul>
+                <p>Ad couldn't load. Please disable ad blockers.</p>
             </div>
         </div>
 
@@ -135,9 +228,7 @@
             <div class="loading">Loading fun games for you...</div>
         </div>
 
-        <!-- ==================== -->
-        <!-- BOTTOM AD (300x250) - WORKING IMPLEMENTATION -->
-        <!-- ==================== -->
+        <!-- Bottom Ad (300x250) -->
         <div class="ad-container" id="bottom-ad">
             <div class="ad-label">Advertisement</div>
             <script type="text/javascript">
@@ -160,7 +251,7 @@
     </div>
 
     <footer>
-        <p>© 2023 Kids Game Hub | All games are kid-friendly and fun!</p>
+        <p>© <span id="current-year"></span> Kids Game Hub | All games are kid-friendly and fun!</p>
     </footer>
 
     <!-- Ad Load Checker -->
@@ -186,9 +277,12 @@
             return "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36";
         });
     }
+
+    // Set current year in footer
+    document.getElementById('current-year').textContent = new Date().getFullYear();
     </script>
 
-    <!-- Your existing game JavaScript -->
+    <!-- Game Grid Logic -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const gamesContainer = document.getElementById('games-container');
@@ -264,7 +358,7 @@
                 html += `
                     <div class="game-card" onclick="window.open('${game.link}', '_blank')">
                         <img src="${iconUrl}" alt="${game.name}" class="game-icon" 
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/200x150/4ECDC4/FFFFFF?text=Game+Image'">
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/200x120/4ECDC4/FFFFFF?text=Game+Image'">
                         <h3 class="game-name">${game.name}</h3>
                     </div>
                 `;
